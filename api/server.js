@@ -9,6 +9,16 @@ server.use(express.json());
 
 //ROUTES//
 
+//default response
+
+server.get("/", async (req, res) => {
+  try {
+    res.json({ message: "All your base are belong to us." });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 //get all fams
 
 server.get("/families", async (req, res) => {
