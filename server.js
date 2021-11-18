@@ -11,9 +11,9 @@ app.use(express.json());
 
 //default response
 
-app.get("/", async (req, res) => {
+app.get("/", async (request, response) => {
   try {
-    res.json({ message: "All your base are belong to us." });
+    response.json({ message: "All your base are belong to us." });
   } catch (err) {
     console.error(err.message);
   }
@@ -21,10 +21,10 @@ app.get("/", async (req, res) => {
 
 //get all fams
 
-app.get("/families", async (req, res) => {
+app.get("/families", async (request, response) => {
   try {
     const allFamilies = await pool.query("SELECT * FROM families");
-    res.json(allFamilies.rows);
+    response.json(allFamilies.rows);
   } catch (err) {
     console.error(err.message);
   }
@@ -32,13 +32,13 @@ app.get("/families", async (req, res) => {
 
 //get a test
 
-app.get("/tests/:id", async (req, res) => {
+app.get("/tests/:id", async (request, response) => {
   try {
-    const { id } = req.params;
+    const { id } = request.params;
     const test = await pool.query("SELECT * FROM tests WHERE id = $1", [
       id
     ]);
-    res.json(test.rows[0]);
+    response.json(test.rows[0]);
   } catch (err) {
     console.error(err.message);
   }
@@ -47,10 +47,10 @@ app.get("/tests/:id", async (req, res) => {
 //get attempts for that test for a certain user
 //not quite right
 
-app.get("/attempts", async (req, res) => {
+app.get("/attempts", async (request, response) => {
   try {
     const allAttempts = await pool.query("SELECT * FROM attempts");
-    res.json(allAttempts.rows);
+    response.json(allAttempts.rows);
   } catch (err) {
     console.error(err.message);
   }
@@ -68,14 +68,14 @@ app.get("/attempts", async (req, res) => {
 //   "dataset": ["blah"]
 // }
 
-app.post("/families", async (req, res) => {
+app.post("/families", async (request, response) => {
   try {
-    const { mod, name, dataset } = req.body;
+    const { mod, name, dataset } = request.body;
     const newFamily = await pool.query(
       "INSERT INTO families (mod, name, dataset) VALUES($1, $2, $3) RETURNING *",
       [mod, name, dataset]
     );
-    res.json(newFamily.rows[0]);
+    response.json(newFamily.rows[0]);
   } catch (err) {
     console.error(err.message);
   }
@@ -90,14 +90,14 @@ app.post("/families", async (req, res) => {
 //   "family": 2
 // }
 
-app.post("/tests", async (req, res) => {
+app.post("/tests", async (request, response) => {
   try {
-    const { description, expected, methods, family } = req.body;
+    const { description, expected, methods, family } = request.body;
     const newTest = await pool.query(
       "INSERT INTO tests (description, expected, methods, family) VALUES($1, $2, $3, $4) RETURNING *",
       [description, expected, methods, family]
     );
-    res.json(newTest.rows[0]);
+    response.json(newTest.rows[0]);
   } catch (err) {
     console.error(err.message);
   }
@@ -113,14 +113,14 @@ app.post("/tests", async (req, res) => {
 //   "test_id": 666
 // }
 
-app.post("/attempts", async (req, res) => {
+app.post("/attempts", async (request, response) => {
   try {
-    const { passing, code, output, user_id, test_id } = req.body;
+    const { passing, code, output, user_id, test_id } = request.body;
     const newAttempt = await pool.query(
       "INSERT INTO attempts (passing, code, output, user_id, test_id) VALUES($1, $2, $3, $4, $5) RETURNING *",
       [passing, code, output, user_id, test_id]
     );
-    res.json(newAttempt.rows[0]);
+    response.json(newAttempt.rows[0]);
   } catch (err) {
     console.error(err.message);
   }
@@ -134,16 +134,16 @@ app.post("/attempts", async (req, res) => {
 //   "output": "good"
 // }
 
-app.put("/attempts/:id", async (req, res) => {
+app.put("/attempts/:id", async (request, response) => {
   try {
-    const { id } = req.params;
-    const { passing, code, output } = req.body;
+    const { id } = request.params;
+    const { passing, code, output } = request.body;
     const updateAttempt = await pool.query(
       "UPDATE attempts SET passing = $1, code = $2, output = $3 WHERE id = $4",
       [passing, code, output, id]
     );
 
-    res.json("Attempt was updated!");
+    response.json("Attempt was updated!");
   } catch (err) {
     console.error(err.message);
   }
@@ -151,13 +151,13 @@ app.put("/attempts/:id", async (req, res) => {
 
 //delete an attempt
 
-app.delete("/attempts/:id", async (req, res) => {
+app.delete("/attempts/:id", async (request, response) => {
   try {
-    const { id } = req.params;
+    const { id } = request.params;
     const deleteAttempt = await pool.query("DELETE FROM attempts WHERE id = $1", [
       id
     ]);
-    res.json("Attempt was deleted!");
+    response.json("Attempt was deleted!");
   } catch (err) {
     console.log(err.message);
   }
