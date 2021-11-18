@@ -1,17 +1,17 @@
 const express = require("express");
-const server = express();
+const app = express();
 const cors = require("cors");
-const pool = require("../db");
+const pool = require("./db");
 
 //middleware
-server.use(cors());
-server.use(express.json());
+app.use(cors());
+app.use(express.json());
 
 //ROUTES//
 
 //default response
 
-server.get("/", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     res.json({ message: "All your base are belong to us." });
   } catch (err) {
@@ -21,7 +21,7 @@ server.get("/", async (req, res) => {
 
 //get all fams
 
-server.get("/families", async (req, res) => {
+app.get("/families", async (req, res) => {
   try {
     const allFamilies = await pool.query("SELECT * FROM families");
     res.json(allFamilies.rows);
@@ -32,7 +32,7 @@ server.get("/families", async (req, res) => {
 
 //get a test
 
-server.get("/tests/:id", async (req, res) => {
+app.get("/tests/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const test = await pool.query("SELECT * FROM tests WHERE id = $1", [
@@ -47,7 +47,7 @@ server.get("/tests/:id", async (req, res) => {
 //get attempts for that test for a certain user
 //not quite right
 
-server.get("/attempts", async (req, res) => {
+app.get("/attempts", async (req, res) => {
   try {
     const allAttempts = await pool.query("SELECT * FROM attempts");
     res.json(allAttempts.rows);
@@ -68,7 +68,7 @@ server.get("/attempts", async (req, res) => {
 //   "dataset": ["blah"]
 // }
 
-server.post("/families", async (req, res) => {
+app.post("/families", async (req, res) => {
   try {
     const { mod, name, dataset } = req.body;
     const newFamily = await pool.query(
@@ -90,7 +90,7 @@ server.post("/families", async (req, res) => {
 //   "family": 2
 // }
 
-server.post("/tests", async (req, res) => {
+app.post("/tests", async (req, res) => {
   try {
     const { description, expected, methods, family } = req.body;
     const newTest = await pool.query(
@@ -113,7 +113,7 @@ server.post("/tests", async (req, res) => {
 //   "test_id": 666
 // }
 
-server.post("/attempts", async (req, res) => {
+app.post("/attempts", async (req, res) => {
   try {
     const { passing, code, output, user_id, test_id } = req.body;
     const newAttempt = await pool.query(
@@ -134,7 +134,7 @@ server.post("/attempts", async (req, res) => {
 //   "output": "good"
 // }
 
-server.put("/attempts/:id", async (req, res) => {
+app.put("/attempts/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { passing, code, output } = req.body;
@@ -151,7 +151,7 @@ server.put("/attempts/:id", async (req, res) => {
 
 //delete an attempt
 
-server.delete("/attempts/:id", async (req, res) => {
+app.delete("/attempts/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deleteAttempt = await pool.query("DELETE FROM attempts WHERE id = $1", [
@@ -163,4 +163,4 @@ server.delete("/attempts/:id", async (req, res) => {
   }
 });
 
-module.exports = server;
+module.exports = app;
