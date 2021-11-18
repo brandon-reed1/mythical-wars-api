@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const pool = require("./db");
+require('dotenv').config()
 
 //middleware
 app.use(cors());
@@ -153,6 +154,8 @@ app.delete("/attempts/:id", async (req, res) => {
   }
 });
 
-app.listen(6000, () => {
-  console.log('app has started on 6000')
+let port = process.env.PORT
+
+app.listen(port, () => {
+  console.log(`app has started on port ${port}`)
 })
