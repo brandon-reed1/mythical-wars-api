@@ -1,5 +1,6 @@
-const Pool = require("pg").Pool;
-require("dotenv").config();
+require('dotenv').config();
+const Pool = require('pg-pool');
+const url = require('url')
 
 const devConfig = {
   user: process.env.PG_USER,
@@ -9,7 +10,19 @@ const devConfig = {
   port: process.env.PG_PORT,
 };
 
-const proConfig = process.env.DATABASE_URL;
+const params = url.parse(process.env.DATABASE_URL);
+const auth = params.auth.split(':');
+
+const proConfig = {
+  user: auth[0],
+  password: auth[1],
+  host: params.hostname,
+  port: params.port,
+  database: params.pathname.split('/')[1],
+  ssl: true
+};
+
+// const proConfig = process.env.DATABASE_URL;
 
 const pool = new Pool(
   process.env.NODE_ENV === "production" ? proConfig : devConfig
