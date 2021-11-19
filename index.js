@@ -1,18 +1,8 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-// const pool = require("./db");
+const client = require('./db');
 const PORT = process.env.PORT || 6000;
-const { Client } = require('pg');
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
-client.connect();
 
 //middleware
 app.use(cors());

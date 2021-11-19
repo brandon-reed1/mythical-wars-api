@@ -1,7 +1,6 @@
 require('dotenv').config();
 const Pool = require('pg-pool');
 const { Client } = require('pg');
-// const url = require('url')
 
 let client
 
