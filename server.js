@@ -10,7 +10,6 @@ app.use(express.json());
 //ROUTES//
 
 //default response
-
 app.get("/", async (request, response) => {
   try {
     response.json({ message: "All your base are belong to us." });
@@ -20,7 +19,6 @@ app.get("/", async (request, response) => {
 });
 
 //get all fams
-
 app.get("/families", async (request, response) => {
   try {
     const allFamilies = await pool.query("SELECT * FROM families");
@@ -31,7 +29,6 @@ app.get("/families", async (request, response) => {
 });
 
 //get a test
-
 app.get("/tests/:id", async (request, response) => {
   try {
     const { id } = request.params;
@@ -46,7 +43,6 @@ app.get("/tests/:id", async (request, response) => {
 
 //get attempts for that test for a certain user
 //not quite right
-
 app.get("/attempts", async (request, response) => {
   try {
     const allAttempts = await pool.query("SELECT * FROM attempts");
@@ -57,23 +53,27 @@ app.get("/attempts", async (request, response) => {
 });
 
 //create a user
-
+app.post("/user", async (request, response) => {
+  try {
+    const { user_name, current_mod } = request.body;
+    const newUser = await pool.query(
+      "INSERT INTO families (user_name, current_mod) VALUES($1, $2) RETURNING *",
+      [user_name, current_mod]
+    );
+    response.json(newUser.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 
 //create a new family
-
-// {
-//   "mod": 2,
-//   "name": "burp",
-//   "dataset": ["blah"]
-// }
-
 app.post("/families", async (request, response) => {
   try {
-    const { mod, name, dataset } = request.body;
+    const { mod, title, datasets } = request.body;
     const newFamily = await pool.query(
-      "INSERT INTO families (mod, name, dataset) VALUES($1, $2, $3) RETURNING *",
-      [mod, name, dataset]
+      "INSERT INTO families (mod, title, datasets) VALUES($1, $2, $3) RETURNING *",
+      [mod, title, datasets]
     );
     response.json(newFamily.rows[0]);
   } catch (err) {
