@@ -1,8 +1,18 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const pool = require("./db");
+// const pool = require("./db");
 const PORT = process.env.PORT || 6000;
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+client.connect();
 
 //middleware
 app.use(cors());
@@ -22,7 +32,7 @@ app.get("/", async (request, response) => {
 //get all fams
 app.get("/families", async (request, response) => {
   try {
-    const allFamilies = await pool.query("SELECT * FROM families");
+    const allFamilies = await client.query("SELECT * FROM families");
     response.json(allFamilies.rows);
   } catch (err) {
     console.error(err.message);
@@ -33,7 +43,7 @@ app.get("/families", async (request, response) => {
 app.get("/tests/:id", async (request, response) => {
   try {
     const { id } = request.params;
-    const test = await pool.query("SELECT * FROM tests WHERE id = $1", [
+    const test = await client.query("SELECT * FROM tests WHERE id = $1", [
       id
     ]);
     response.json(test.rows[0]);
@@ -46,7 +56,7 @@ app.get("/tests/:id", async (request, response) => {
 //not quite right
 app.get("/attempts", async (request, response) => {
   try {
-    const allAttempts = await pool.query("SELECT * FROM attempts");
+    const allAttempts = await client.query("SELECT * FROM attempts");
     response.json(allAttempts.rows);
   } catch (err) {
     console.error(err.message);
@@ -57,7 +67,7 @@ app.get("/attempts", async (request, response) => {
 app.post("/user", async (request, response) => {
   try {
     const { user_name, current_mod } = request.body;
-    const newUser = await pool.query(
+    const newUser = await client.query(
       "INSERT INTO users (user_name, current_mod) VALUES($1, $2) RETURNING *",
       [user_name, current_mod]
     );
@@ -71,7 +81,7 @@ app.post("/user", async (request, response) => {
 app.post("/families", async (request, response) => {
   try {
     const { mod, title, datasets } = request.body;
-    const newFamily = await pool.query(
+    const newFamily = await client.query(
       "INSERT INTO families (mod, title, datasets) VALUES($1, $2, $3) RETURNING *",
       [mod, title, datasets]
     );
@@ -85,7 +95,7 @@ app.post("/families", async (request, response) => {
 app.post("/tests", async (request, response) => {
   try {
     const { test_name, instructions, expected, methods, family } = request.body;
-    const newTest = await pool.query(
+    const newTest = await client.query(
       "INSERT INTO tests (test_name, instructions, expected, methods, family) VALUES($1, $2, $3, $4) RETURNING *",
       [test_name, instructions, expected, methods, family]
     );
@@ -99,7 +109,7 @@ app.post("/tests", async (request, response) => {
 app.post("/attempts", async (request, response) => {
   try {
     const { user_id, test_id, passing, code, result } = request.body;
-    const newAttempt = await pool.query(
+    const newAttempt = await client.query(
       "INSERT INTO attempts (user_id, test_id, passing, code, result) VALUES($1, $2, $3, $4, $5) RETURNING *",
       [user_id, test_id, passing, code, result]
     );
@@ -114,7 +124,7 @@ app.put("/attempts/:id", async (request, response) => {
   try {
     const { id } = request.params;
     const { passing, code, result } = request.body;
-    const updateAttempt = await pool.query(
+    const updateAttempt = await client.query(
       "UPDATE attempts SET passing = $1, code = $2, result = $3 WHERE id = $4",
       [passing, code, result, id]
     );
@@ -128,7 +138,7 @@ app.put("/attempts/:id", async (request, response) => {
 app.delete("/attempts/:id", async (request, response) => {
   try {
     const { id } = request.params;
-    const deleteAttempt = await pool.query("DELETE FROM attempts WHERE id = $1", [
+    const deleteAttempt = await client.query("DELETE FROM attempts WHERE id = $1", [
       id
     ]);
     response.json("Attempt was deleted!");
