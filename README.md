@@ -90,4 +90,4 @@ This API was built using [Node.js](https://nodejs.org/), [Express](https://expre
 5. Open `http://localhost:6000/` in your preferred browser
 
 ## Contributors
-This application was built by [Alex Kio](https://github.com/alexmkio/); a Front End Engineering, Mod 3 student at the [Turing School of Software and Design](https://turing.io/).
+This application was built by [Alex Kio](https://github.com/alexmkio/); a Front End Engineering alum from the [Turing School of Software and Design](https://turing.io/).
